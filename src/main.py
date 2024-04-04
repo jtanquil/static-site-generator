@@ -1,5 +1,6 @@
 from textnode import TextNode
+from htmlnode import HTMLNode
 
-test = TextNode("hi", "bold", "https://www.google.com")
+test = HTMLNode("p", "test", None)
 
-print(test)
+print(test, test.props_to_html())
