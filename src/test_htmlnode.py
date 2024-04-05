@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
   def setUp(self):
@@ -32,6 +32,21 @@ class TestLeafNode(unittest.TestCase):
     self.assertEqual(self.plain_leaf_node.to_html(), plain_leaf_node_text)
     self.assertEqual(self.leaf_node_with_tag.to_html(), leaf_node_with_tag_text)
     self.assertEqual(self.leaf_node_tag_props.to_html(), leaf_node_tag_props_text)
+
+class TestParentNode(HTMLNode):
+  def setUp(self):
+    self.leaf_node = LeafNode("b", "hi")
+    self.parent_node_only_leaf = ParentNode("p", [self.leaf_node])
+    self.parent_node_no_children = ParentNode("div")
+    self.parent_node_no_tag = ParentNode()
+    self.parent_node_recurse = ParentNode("article", [self.leaf_node, self.parent_node_only_leaf], {"href": "https://www.google.com", "target": "_blank"})
+
+  def test_to_html(self):
+    self.assertRaises(ValueError, self.parent_node_no_children.to_html())
+    self.assertRaises(ValueError, self.parent_node_no_tag.to_html())
+
+    self.assertEqual(self.parent_node_only_leaf.to_html(), "<p><b>hi</b></p>")
+    self.assertEqual(self.parent_node_recurse.to_html(), '<article href="https://www.google.com" target="_blank"><b>hi</b><p><b>hi</b></p></article>')
 
 if __name__ == "__main__":
   unittest.main()
