@@ -1,6 +1,6 @@
 import unittest
 
-from textnode import TextNode
+from textnode import *
 
 class TestTextNode(unittest.TestCase):
   def test_eq(self):
@@ -23,6 +23,25 @@ class TestTextNode(unittest.TestCase):
     node2 = TextNode("test node 2", "strikethrough")
     self.assertEqual(repr(node), "TextNode(test node, italics, https://www.google.com)")
     self.assertEqual(repr(node2), "TextNode(test node 2, strikethrough, None)")
+
+class TestTextNodeToHTMLNode(unittest.TestCase):
+  def setUp(self):
+    self.plain_text_node = TextNode("test", text_type_text)
+    self.bold_text_node = TextNode("test", text_type_bold)
+    self.italic_text_node = TextNode("test", text_type_italic)
+    self.code_text_node = TextNode("test", text_type_code)
+    self.text_type_link = TextNode("test", text_type_link, "https://www.google.com")
+    self.text_type_image = TextNode("test", text_type_image, "https://www.google.com")
+    self.text_type_invalid = TextNode("test", "test")
+
+  def test_text_node_to_html_node(self):
+    self.assertEqual(text_node_to_html_node(self.plain_text_node).to_html(), "test")
+    self.assertEqual(text_node_to_html_node(self.bold_text_node).to_html(), "<b>test</b>")
+    self.assertEqual(text_node_to_html_node(self.italic_text_node).to_html(), "<i>test</i>")
+    self.assertEqual(text_node_to_html_node(self.code_text_node).to_html(), "<code>test</code>")
+    self.assertEqual(text_node_to_html_node(self.text_type_link).to_html(), '<a href="https://www.google.com">test</a>')
+    self.assertEqual(text_node_to_html_node(self.text_type_image).to_html(), '<img src="https://www.google.com" alt="test">')
+    self.assertRaises(ValueError, text_node_to_html_node, self.text_type_invalid)
 
 if __name__ == "__main__":
   unittest.main()

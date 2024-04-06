@@ -42,8 +42,8 @@ class TestParentNode(HTMLNode):
     self.parent_node_recurse = ParentNode("article", [self.leaf_node, self.parent_node_only_leaf], {"href": "https://www.google.com", "target": "_blank"})
 
   def test_to_html(self):
-    self.assertRaises(ValueError, self.parent_node_no_children.to_html())
-    self.assertRaises(ValueError, self.parent_node_no_tag.to_html())
+    self.assertRaises(ValueError, self.parent_node_no_children.to_html)
+    self.assertRaises(ValueError, self.parent_node_no_tag.to_html)
 
     self.assertEqual(self.parent_node_only_leaf.to_html(), "<p><b>hi</b></p>")
     self.assertEqual(self.parent_node_recurse.to_html(), '<article href="https://www.google.com" target="_blank"><b>hi</b><p><b>hi</b></p></article>')
