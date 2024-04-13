@@ -44,28 +44,6 @@ def text_node_to_html_node(text_node):
   else:
     raise ValueError(f"TextNode type must be one of {text_type_text}, {text_type_bold}, {text_type_italic}, {text_type_code}, {text_type_link}, {text_type_image}.")
 
-# input: a list of TextNodes, a delimiter, and a text type
-# output: a list of TextNodes obtained by splitting up each input TextNode based on the given delimiter:
-# (ex: "this **is bold** text" => TextNode("this ", text_node_text), TextNode("is bold", text_type_bold), TextNode(" text", text_node_text))
-# scope: a single delimiter, one level deep - don't worry about nested delimiters for now
-# edge cases: delimiter not found, entire text value is within the delimiter (=> beginning/end are in the delimiter), unclosed delimiters
-
-# given a TextNode with a value val, a delimiter, and a text type,
-# set delimiter_is_closed = True; this will represent whether the current delimiter has been closed
-# set nodes = []; this will be the list of new nodes returned
-# for each node in old_nodes:
-# if the node's tag is not text, add it to the list of nodes unchanged
-# split the node with the corresponding regex
-# test for unclosed tags, raise an error if they are found:
-#   - if the length of the list of split nodes is even, raise an error (even split => odd number of matched tags => there is an unclosed tag)
-# otherwise, add nodes to the list of nodes:
-#   - set last_node_tagged = False; nodes are tagged or untagged in alternating order so this is used to set the tag appropriately
-#   - if the first element of the list is the empty string, the first non-empty element is tagged, add it as a node to nodes with that tag and set last_node_tagged = True
-#     - => if the first element is the empty string, continue to the next element
-#   - otherwise, the first element is untagged, add it to the node as a plain text node, set last_node_tagged = False
-#   - alternate between tag/untagged nodes => if last_node_tagged = True, add the current node as a plain text tag, otherwise add it as a tagged tag
-#   - if the last element is empty, discard it; in that case, the last element was tagged
-
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
   text_type_regexes = {
     text_type_delimiters[text_type_bold]: re.compile(r"\*\*"),

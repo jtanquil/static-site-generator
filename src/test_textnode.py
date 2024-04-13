@@ -43,13 +43,6 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
     self.assertEqual(text_node_to_html_node(self.text_type_image).to_html(), '<img src="https://www.google.com" alt="test">')
     self.assertRaises(ValueError, text_node_to_html_node, self.text_type_invalid)
 
-# test:
-# text node with no inline elements
-# text node with one inline element surrounding the entire text value (ex: "*bold*")
-# text node with inline elements at the beginning/end of the line
-# text node with multiple inline elements
-# text node with a unclosed inline element (ex: "here is `some code") at beginning/mid/end
-# multiple text nodes with each property above ^
 class TestSplitNodesDelimiter(unittest.TestCase):
   def setUp(self):
     self.test_cases = {}
