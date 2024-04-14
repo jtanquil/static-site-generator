@@ -51,23 +51,14 @@ def extract_markdown_links(text):
   link_regex = r"\[(.*?)\]\((.*?)\)"
   return extract_text_with_regex(text, link_regex)
 
-# given a list of nodes old_nodes:
-# let nodes = []
-# for each node in old_nodes,
-# let images = extract_markdown_images(node.text)
-# if images = [], then append node to nodes and continue
-# otherwise, let current_node_text = node.text
-# for each image in images,
-# let image_string_delimiter be the image tag represented by the corresponding image tuple
-# set split_node_elements to current_node_text.split(image_string_delimiter, 1)
-# if the first element is nonempty, append the textnode representing that string to nodes
-# add an image textnode representing image to nodes
-# set current_node_text = the last element of split_node_elements
-# return nodes
 def split_nodes_image(old_nodes):
   nodes = []
 
   for node in old_nodes:
+    if node.text_type != text_type_text:
+      nodes.append(node)
+      continue
+
     images = extract_markdown_images(node.text)
 
     if images == []:
@@ -95,6 +86,10 @@ def split_nodes_link(old_nodes):
   nodes = []
 
   for node in old_nodes:
+    if node.text_type != text_type_text:
+      nodes.append(node)
+      continue
+    
     links = extract_markdown_links(node.text)
 
     if links == []:
