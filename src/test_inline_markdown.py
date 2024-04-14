@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import *
-from inline_markdown import split_nodes_delimiter
+from inline_markdown import *
 
 class TestSplitNodesDelimiter(unittest.TestCase):
   def setUp(self):
@@ -46,6 +46,39 @@ class TestSplitNodesDelimiter(unittest.TestCase):
     for exception in self.exceptions:
       delimiter = text_type_delimiters[self.exceptions[exception][1]]
       self.assertRaises(ValueError, split_nodes_delimiter, [self.exceptions[exception][0]], delimiter, self.exceptions[exception][1])
+
+class TestExtractMarkdownImages(unittest.TestCase):
+  def setUp(self):
+    self.test_cases = {}
+    self.test_results = {}
+
+    self.test_cases["no_images"] = "this text has no images"
+    self.test_results["no_images"] = []
+
+    self.test_cases["no_alt_text"] = "this ![](https://www.test.com/test.jpg) has no alt text"
+    self.test_results["no_alt_text"] = [("", "https://www.test.com/test.jpg")]
+
+    self.test_cases["alt_text"] = "this ![hi](https://www.test.com/test1.jpg) has some ![alt text](https://www.test.com/test2.png)"
+    self.test_results["alt_text"] = [("hi", "https://www.test.com/test1.jpg"), ("alt text", "https://www.test.com/test2.png")]
+
+  def test_extract_markdown_images(self):
+    for case in self.test_cases:
+      self.assertEqual(extract_markdown_images(self.test_cases[case]), self.test_results[case])
+
+class TestExtractLinks(unittest.TestCase):
+  def setUp(self):
+    self.test_cases = {}
+    self.test_results = {}
+
+    self.test_cases["no_links"] = "this text has no links"
+    self.test_results["no_links"] = []
+
+    self.test_cases["links"] = "this text [has](https://www.google.com) [links](https://www.yahoo.com)"
+    self.test_results["links"] = [("has", "https://www.google.com"), ("links", "https://www.yahoo.com")]
+
+  def test_extract_markdown_links(self):
+    for case in self.test_cases:
+      self.assertEqual(extract_markdown_links(self.test_cases[case]), self.test_results[case])
 
 if __name__ == "__main__":
   unittest.main()

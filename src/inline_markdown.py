@@ -39,3 +39,14 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         last_node_tagged = not last_node_tagged
 
   return nodes
+
+def extract_text_with_regex(text, regex_string):
+  return re.findall(regex_string, text)
+
+def extract_markdown_images(text):
+  image_regex = r"!\[(.*?)\]\((.*?)\)"
+  return extract_text_with_regex(text, image_regex)
+
+def extract_markdown_links(text):
+  link_regex = r"\[(.*?)\]\((.*?)\)"
+  return extract_text_with_regex(text, link_regex)
