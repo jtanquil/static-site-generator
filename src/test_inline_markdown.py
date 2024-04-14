@@ -100,7 +100,21 @@ class TestSplitNodesImage(unittest.TestCase):
 
 class TestSplitNodesLink(unittest.TestCase):
   def setUp(self):
-    pass
+    self.test_cases = {}
+    self.test_results = {}
+
+    self.test_cases["no_links"] = [TextNode("no links", text_type_text)]
+    self.test_results["no_links"] = [TextNode("no links", text_type_text)]
+
+    self.test_cases["links_at_ends"] = [TextNode("[link](https://www.google.com) at the beginning and at the [end](https://www.yahoo.com)", text_type_text)]
+    self.test_results["links_at_ends"] = [TextNode("link", text_type_link, "https://www.google.com"), TextNode(" at the beginning and at the ", text_type_text), TextNode("end", text_type_link, "https://www.yahoo.com")]
+
+    self.test_cases["multiple_links"] = [TextNode("multiple [links](https://www.google.com) [here](https://www.yahoo.com)[no space](https://www.google.com) here", text_type_text)]
+    self.test_results["multiple_links"] = [TextNode("multiple ", text_type_text), TextNode("links", text_type_link, "https://www.google.com") , TextNode(" ", text_type_text), TextNode("here", text_type_link, "https://www.yahoo.com"), TextNode("no space", text_type_link, "https://www.google.com"), TextNode(" here", text_type_text)]
+
+  def test_split_nodes_link(self):
+    for case in self.test_cases:
+      self.assertEqual(split_nodes_link(self.test_cases[case]), self.test_results[case])
 
 if __name__ == "__main__":
   unittest.main()
