@@ -80,5 +80,27 @@ class TestExtractLinks(unittest.TestCase):
     for case in self.test_cases:
       self.assertEqual(extract_markdown_links(self.test_cases[case]), self.test_results[case])
 
+class TestSplitNodesImage(unittest.TestCase):
+  def setUp(self):
+    self.test_cases = {}
+    self.test_results = {}
+
+    self.test_cases["no_images"] = [TextNode("no images", text_type_text)]
+    self.test_results["no_images"] = [TextNode("no images", text_type_text)]
+
+    self.test_cases["image_at_ends"] = [TextNode("![image](https://www.google.com/test1.jpg) at beginning and ![end](https://www.yahoo.com/test2.png)", text_type_text)]
+    self.test_results["image_at_ends"] = [TextNode("image", text_type_image, "https://www.google.com/test1.jpg"), TextNode(" at beginning and ", text_type_text), TextNode("end", text_type_image, "https://www.yahoo.com/test2.png")]
+
+    self.test_cases["multiple_images"] = [TextNode("multiple ![images](https://www.google.com/test3.bmp) ![here](https://www.yahoo.com/test4.gif)![test no space](https://www.google.com/test5.png) here", text_type_text)]
+    self.test_results["multiple_images"] = [TextNode("multiple ", text_type_text), TextNode("images", text_type_image, "https://www.google.com/test3.bmp"), TextNode(" ", text_type_text), TextNode("here", text_type_image, "https://www.yahoo.com/test4.gif"), TextNode("test no space", text_type_image, "https://www.google.com/test5.png"), TextNode(" here", text_type_text)]
+
+  def test_split_nodes_image(self):
+    for case in self.test_cases:
+      self.assertEqual(split_nodes_image(self.test_cases[case]), self.test_results[case])
+
+class TestSplitNodesLink(unittest.TestCase):
+  def setUp(self):
+    pass
+
 if __name__ == "__main__":
   unittest.main()

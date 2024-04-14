@@ -50,3 +50,48 @@ def extract_markdown_images(text):
 def extract_markdown_links(text):
   link_regex = r"\[(.*?)\]\((.*?)\)"
   return extract_text_with_regex(text, link_regex)
+
+# given a list of nodes old_nodes:
+# let nodes = []
+# for each node in old_nodes,
+# let images = extract_markdown_images(node.text)
+# if images = [], then append node to nodes and continue
+# otherwise, let current_node_text = node.text
+# for each image in images,
+# let image_string_delimiter be the image tag represented by the corresponding image tuple
+# set split_node_elements to current_node_text.split(image_string_delimiter, 1)
+# if the first element is nonempty, append the textnode representing that string to nodes
+# add an image textnode representing image to nodes
+# set current_node_text = the last element of split_node_elements
+# return nodes
+def split_nodes_image(old_nodes):
+  nodes = []
+
+  for node in old_nodes:
+    images = extract_markdown_images(node.text)
+
+    if images == []:
+      nodes.append(node)
+    else:
+      current_node_text = node.text
+
+      for image in images:
+        image_string_delimiter = f"![{image[0]}]({image[1]})"
+        split_node_elements = current_node_text.split(image_string_delimiter, 1)
+
+        if split_node_elements[0] != "":
+          nodes.append(TextNode(split_node_elements[0], text_type_text))
+
+        nodes.append(TextNode(image[0], text_type_image, image[1]))
+        current_node_text = split_node_elements[-1]
+
+      # if there is text left over, add it to the list
+      if current_node_text != "":
+        nodes.append(TextNode(current_node_text, text_type_text))
+
+  return nodes
+
+def split_nodes_link(old_nodes):
+  nodes = []
+
+  return nodes
