@@ -3,7 +3,7 @@ import re
 from textnode import *
 
 text_type_delimiters = {
-  text_type_text: "",
+  # text_type_text: "",
   text_type_bold: "**",
   text_type_italic: "*",
   text_type_code: "`"
@@ -48,7 +48,7 @@ def extract_markdown_images(text):
   return extract_text_with_regex(text, image_regex)
 
 def extract_markdown_links(text):
-  link_regex = r"\[(.*?)\]\((.*?)\)"
+  link_regex = r"(?<!\!)\[(.*?)\]\((.*?)\)"
   return extract_text_with_regex(text, link_regex)
 
 def split_nodes_image(old_nodes):
@@ -89,7 +89,7 @@ def split_nodes_link(old_nodes):
     if node.text_type != text_type_text:
       nodes.append(node)
       continue
-    
+
     links = extract_markdown_links(node.text)
 
     if links == []:
@@ -109,5 +109,17 @@ def split_nodes_link(old_nodes):
 
       if current_node_text != "":
         nodes.append(TextNode(current_node_text, text_type_text))
+
+  return nodes
+
+def text_to_textnodes(text):
+  initial_node = [TextNode(text, text_type_text)]
+  
+  link_nodes = split_nodes_link(initial_node)
+  image_nodes = split_nodes_image(link_nodes)
+
+  nodes = image_nodes
+  for delimiter in text_type_delimiters:
+    nodes = split_nodes_delimiter(nodes, text_type_delimiters[delimiter], delimiter)
 
   return nodes
