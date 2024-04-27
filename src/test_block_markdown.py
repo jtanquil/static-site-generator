@@ -29,14 +29,36 @@ class TestBlockToBlockType(unittest.TestCase):
       self.test_cases[f"heading {i}"] = f"{'#' * i} heading"
       self.test_results[f"heading {i}"] = block_type_heading
 
-    self.test_cases["code"] = "```code snippet```"
-    self.test_cases["code"] = block_type_code
+    self.test_cases["heading_multiline"] = "# heading\n## except there are two lines"
+    self.test_results["heading_multiline"] = block_type_paragraph
 
-    self.test_cases["quote"] = ">quote\n> more quote"
-    self.test_cases["quote"] = block_type_quote
+    self.test_cases["code"] = "```code\nsnippet```"
+    self.test_results["code"] = block_type_code
+
+    self.test_cases["quote"] = "> quote\n> more quote\n> even more quote"
+    self.test_results["quote"] = block_type_quote
+
+    self.test_cases["asterisk_unordered_list"] = "* unordered list\n* with \n* asterisks"
+    self.test_results["asterisk_unordered_list"] = block_type_unordered_list
+
+    self.test_cases["dash_unordered_list"] = "- unordered list\n- with \n- dashes"
+    self.test_results["dash_unordered_list"] = block_type_unordered_list
+
+    self.test_cases["mixed_unordered_list"] = "* unordered list\n- with \n* asterisks and dashes"
+    self.test_results["mixed_unordered_list"] = block_type_paragraph
+
+    self.test_cases["ordered_list"] = "1. ordered\n2. list"
+    self.test_results["ordered_list"] = block_type_ordered_list
+
+    self.test_cases["wrong_numbers"] = "2. not\na. an\n1. ordered list"
+    self.test_results["wrong_numbers"] = block_type_paragraph
+
+    self.test_cases["no_spaces"] = "1.not\n2. an ordered\n3.list"
+    self.test_results["no_spaces"] = block_type_paragraph
 
   def test_block_to_block_type(self):
-    pass
+    for case in self.test_cases:
+      self.assertEqual(block_to_block_type(self.test_cases[case]), self.test_results[case])
 
 if __name__ == "__main__":
   unittest.main()
