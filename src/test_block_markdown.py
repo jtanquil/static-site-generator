@@ -26,8 +26,8 @@ class TestBlockToBlockType(unittest.TestCase):
     self.test_results["no_type_paragraph"] = block_type_paragraph
 
     for i in range(1, 7):
-      self.test_cases[f"heading {i}"] = f"{'#' * i} heading"
-      self.test_results[f"heading {i}"] = block_type_heading
+      self.test_cases[f"heading_{i}"] = f"{'#' * i} heading"
+      self.test_results[f"heading_{i}"] = block_type_heading
 
     self.test_cases["heading_multiline"] = "# heading\n## except there are two lines"
     self.test_results["heading_multiline"] = block_type_paragraph
