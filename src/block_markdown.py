@@ -16,7 +16,7 @@ def block_to_block_type(block):
   heading_match = re.compile("^#{1,6} .*")
   code_match = re.compile("^```.*```.{0}", flags = re.DOTALL)
   quote_line_match = re.compile("^> .*$")
-  asterisk_unordered_line_match = re.compile("^\* .*$")
+  asterisk_unordered_line_match = re.compile(r"^\* .*$")
   dash_unordered_line_match = re.compile("^- .*$")
 
   if len(block.split("\n")) == 1 and re.match(heading_match, block):
@@ -32,7 +32,7 @@ def block_to_block_type(block):
       return block_type_unordered_list
 
     for i in range(len(lines)):
-      ordered_list_line_match = re.compile(f"^{i + 1}\. .*$")
+      ordered_list_line_match = re.compile(rf"^{i + 1}\. .*$")
 
       if not re.match(ordered_list_line_match, lines[i]):
         return block_type_paragraph

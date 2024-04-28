@@ -32,7 +32,19 @@ class TestBlockToHTMLNode(unittest.TestCase):
 
   def test_block_to_html_node(self):
     for case in self.test_cases:
-      self.assertEqual(block_to_htmlnode(*self.test_cases[case]), self.test_results[case])
+      self.assertEqual(block_to_html_node(*self.test_cases[case]), self.test_results[case])
+
+class TestMarkdownToHTMLNode(unittest.TestCase):
+  def setUp(self):
+    self.test_cases = {}
+    self.test_results = {}
+
+    self.test_cases["nesting"] = "1. ordered list\n2. with **inline** element"
+    self.test_results["nesting"] = ParentNode("div", [ParentNode("ol", [LeafNode("li", "ordered list"), ParentNode("li", [LeafNode(None, "with "), LeafNode("b", "inline"), LeafNode(None, " element")])])])
+
+  def test_markdown_to_html_node(self):
+    for case in self.test_cases:
+      self.assertEqual(markdown_to_html_node(self.test_cases[case]), self.test_results[case])
 
 if __name__ == "__main__":
   unittest.main()
