@@ -19,16 +19,20 @@ def get_heading_text(block):
   return re.split("^#{1,6} ", block)[1]
 
 def get_code_text(block):
-  return block.strip("```")
+  return block.removeprefix("```").removesuffix("```")
 
 def get_quote_text(block):
-  return "\n".join([line.lstrip("> ") for line in block.split("\n")])
+  return "\n".join([line.removeprefix("> ") for line in block.split("\n")])
 
 def get_unordered_list_item_text(item):
-  return item.lstrip("*- ")
+  if item.startswith("*"):
+    return item.removeprefix("* ")
+  else:
+    return item.removeprefix("- ")
 
 def get_ordered_list_item_text(item):
-  return item.lstrip("1234567890. ")
+  # equivalent to removing a digit from 1-9, any number of digits from 0-9 and a ., then whitespace
+  return item.lstrip("123456789").lstrip("1234567890").lstrip(".").lstrip()
 
 def block_to_html_node(block, block_type):
   match block_type:
@@ -37,7 +41,7 @@ def block_to_html_node(block, block_type):
     case block_markdown.block_type_heading:
       return LeafNode(f"h{get_heading_number(block)}", get_heading_text(block))
     case block_markdown.block_type_code:
-      return ParentNode("pre", LeafNode("code", get_code_text(block)))
+      return ParentNode("pre", [LeafNode("code", get_code_text(block))])
     case block_markdown.block_type_quote:
       return LeafNode("blockquote", get_quote_text(block))
     case block_markdown.block_type_unordered_list:
@@ -51,23 +55,35 @@ def block_to_html_node(block, block_type):
 # split the markdown into blocks
 # convert each block into an HTMLNode
 # for each block, extract the inline elements of any LeafNodes:
-# if no children, keep the LeafNode as is
+# for each block, if it's a ParentNode, extract the inline elements of any child LeafNodes,
+# otherwise, if it's a LeafNode, extract any inline elements: given a LeafNode
+# if no inline elements, keep the LeafNode as is
 # otherwise, the LeafNode is converted to a ParentNode with the same tag, 
 # whose children is the list of TextNodes converted into LeafNodes with the appropriate inline tag
+def extract_inline_nodes(node):
+  new_node = None
+
+  if node.value is None:
+    new_node = ParentNode(node.tag, [], node.props)
+
+    for child in node.children:
+      new_node.children.append(extract_inline_nodes(child))
+  else:
+    text_nodes = text_to_textnodes(node.value)
+
+    if len(text_nodes) == 1 and text_nodes[0].text_type == text_type_text:
+      new_node = node
+    else:
+      new_node = ParentNode(node.tag, [text_node_to_html_node(text_node) for text_node in text_nodes], node.props)
+    
+  return new_node
+
 def markdown_to_html_node(markdown):
   blocks = block_markdown.markdown_to_blocks(markdown)
   root_node = ParentNode("div", [block_to_html_node(block, block_markdown.block_to_block_type(block)) for block in blocks])
-  markdown_node = root_node.children[0]
+  content_nodes = root_node.children
 
-  for i in range(len(markdown_node.children)):
-    if markdown_node.children[i].value == "":
-      continue
-    else:
-      text_nodes = text_to_textnodes(markdown_node.children[i].value)
-
-      if len(text_nodes) == 1 and text_nodes[0].text_type == text_type_text:
-        continue
-      else:
-        markdown_node.children[i] = ParentNode(markdown_node.children[i].tag, [text_node_to_html_node(node) for node in text_nodes])
+  for i in range(len(content_nodes)):
+    content_nodes[i] = extract_inline_nodes(content_nodes[i])
 
   return root_node

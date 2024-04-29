@@ -16,7 +16,7 @@ class TestBlockToHTMLNode(unittest.TestCase):
       self.test_results[f"heading_{i}"] = LeafNode(f"h{i}", "heading")
 
     self.test_cases["code"] = ("```code\nsnippet```", block_type_code)
-    self.test_results["code"] = ParentNode("pre", LeafNode("code", "code\nsnippet"))
+    self.test_results["code"] = ParentNode("pre", [LeafNode("code", "code\nsnippet")])
 
     self.test_cases["quote"] = ("> quote\n> more quote\n> even more quote", block_type_quote)
     self.test_results["quote"] = LeafNode("blockquote", "quote\nmore quote\neven more quote")
@@ -33,14 +33,14 @@ class TestBlockToHTMLNode(unittest.TestCase):
   def test_block_to_html_node(self):
     for case in self.test_cases:
       self.assertEqual(block_to_html_node(*self.test_cases[case]), self.test_results[case])
-
+      
 class TestMarkdownToHTMLNode(unittest.TestCase):
   def setUp(self):
     self.test_cases = {}
     self.test_results = {}
 
-    self.test_cases["nesting"] = "1. ordered list\n2. with **inline** element"
-    self.test_results["nesting"] = ParentNode("div", [ParentNode("ol", [LeafNode("li", "ordered list"), ParentNode("li", [LeafNode(None, "with "), LeafNode("b", "inline"), LeafNode(None, " element")])])])
+    self.test_cases["nesting"] = "1. ordered list\n2. with **inline** element\n\nanother block"
+    self.test_results["nesting"] = ParentNode("div", [ParentNode("ol", [LeafNode("li", "ordered list"), ParentNode("li", [LeafNode(None, "with "), LeafNode("b", "inline"), LeafNode(None, " element")])]), LeafNode("p", "another block")])
 
   def test_markdown_to_html_node(self):
     for case in self.test_cases:
